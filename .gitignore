@@ -1,2 +1,6 @@
 node_modules
 package-lock.json
+*/desktop.ini
+desktop.ini
+.vscode
+*.log
