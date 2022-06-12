@@ -1,6 +1,6 @@
 'use strict'
 
-// ## Выход из личного кабинета
+// ## Logout
 const logonButton = new LogoutButton();
 logonButton.action = function () {
     ApiConnector.logout((serverAnswer) => {
@@ -8,10 +8,10 @@ logonButton.action = function () {
             location.reload();
         }
     });
-}
+}   //  logonButton.action
 
 
-// ## Получение информации о пользователе
+// ## User info
 ApiConnector.current((serverAnswer) => {
     if (serverAnswer.success) {
         ProfileWidget.showProfile(serverAnswer.data);
@@ -19,7 +19,7 @@ ApiConnector.current((serverAnswer) => {
 });
 
 
-// ## Получение текущих курсов валюты
+// ## Rates
 const ratesBoard = new RatesBoard();
 
 const getRates = function () {
@@ -31,16 +31,15 @@ const getRates = function () {
             ratesBoard.fillTable(serverAnswer.data);
         }
     });
-}
+}   //  const getRates function
 
 getRates();
 setInterval(getRates, 60000);
 
-// ## Операции с деньгами
-// 1. Создайте объект типа `MoneyManager`
+
+//  ## Money
 const moneyManager = new MoneyManager();
 
-// 2. Реализуйте пополнение баланса
 moneyManager.addMoneyCallback = function (data) {
     ApiConnector.addMoney(data, (serverAnswer) => {
         // debugger;
@@ -51,10 +50,9 @@ moneyManager.addMoneyCallback = function (data) {
             moneyManager.setMessage(false, 'Пополнение не удалось:\n' + serverAnswer.error);
         }
     });
-}
+}   //  moneyManager.addMoneyCallback
 
 
-// 3. Реализуйте конвертирование валюты:
 moneyManager.conversionMoneyCallback = function (data) {
     ApiConnector.convertMoney(data, (serverAnswer) => {
         // debugger;
@@ -65,10 +63,9 @@ moneyManager.conversionMoneyCallback = function (data) {
             moneyManager.setMessage(false, 'Конвертация не удалась:\n' + serverAnswer.error);
         }
     });
-}
+}   //  moneyManager.conversionMoneyCallback
 
 
-// 4. Реализуйте перевод валюты:
 moneyManager.sendMoneyCallback = function (data) {
     ApiConnector.transferMoney(data, (serverAnswer) => {
         // debugger;
@@ -79,19 +76,12 @@ moneyManager.sendMoneyCallback = function (data) {
             moneyManager.setMessage(false, 'Перевод не удался:\n' + serverAnswer.error);
         }
     });
-}
+}   //  moneyManager.sendMoneyCallback
 
 
-// ## Работа с избранным
-// 1. Создайте объект типа `FavoritesWidget`
+// ## Favorites
 const favoritesWidget = new FavoritesWidget();
 
-// 2. Запросите начальный список избранного:
-//     1. Выполните запрос на получение списка избранного (`getFavorites`).
-//     2. В колбеке запроса проверяйте успешность запроса.
-//     3. При успешном запросе очистите текущий список избранного (`clearTable`).
-//     4. Отрисуйте полученные данные (`fillTable`).
-//     5. Заполните выпадающий список для перевода денег (`updateUsersList`).
 ApiConnector.getFavorites((serverAnswer) => {
     // debugger;
     if (serverAnswer.success) {
@@ -103,13 +93,6 @@ ApiConnector.getFavorites((serverAnswer) => {
     }
 });
 
-// 3. Реализуйте добавления пользователя в список избранных:
-//     1. Запишите в свойство `addUserCallback` функцию, которая будет выполнять запрос.
-//     2. Внутри функции выполните запрос на добавление пользователя (`addUserToFavorites`).
-//     3. Используйте аргумент функции свойства `addUserCallback` для передачи данных пользователя в запрос.
-//     4. После выполнения запроса выполните проверку успешности запроса.
-//     5. В случае успеха запроса выполните пункты 2.3-2.5
-//     6. Также выведите сообщение об успехе или *ошибку* (причину неудачного действия) добавлении пользователя в окне отображения сообщения (`setMessage`).
 favoritesWidget.addUserCallback = function (data) {
     ApiConnector.addUserToFavorites(data, (serverAnswer) => {
         // debugger;
@@ -117,16 +100,24 @@ favoritesWidget.addUserCallback = function (data) {
             favoritesWidget.clearTable();
             favoritesWidget.fillTable(serverAnswer.data);
             moneyManager.updateUsersList(serverAnswer.data);
-            favoritesWidget.setMessage(true, 'Адресная книга обновлена.');
+            favoritesWidget.setMessage(true, 'Пользователь успешно добавлен в адресную книгу.');
         } else {
-            favoritesWidget.setMessage(false, 'Список адресной книги получить не удалось:\n' + serverAnswer.error);
+            favoritesWidget.setMessage(false, 'Добавить в адресуню книгу не удалось:\n' + serverAnswer.error);
         }
     });
-};
+}
 
 
-// 4. Реализуйте удаление пользователя из избранного
-//     1. Запишите в свойство `removeUserCallback` функцию, которая будет выполнять запрос.
-//     2. Внутри функции выполните запрос на удаление пользователя (`removeUserFromFavorites`).
-//     3. Используйте аргумент функции свойства `removeUserCallback` для передачи данных пользователя в запрос.
-//     4. После запроса выполните пункты 3.4-3.6
+favoritesWidget.removeUserCallback = function (data) {
+    ApiConnector.removeUserFromFavorites(data, (serverAnswer) => {
+        // debugger;
+        if (serverAnswer.success) {
+            favoritesWidget.clearTable();
+            favoritesWidget.fillTable(serverAnswer.data);
+            moneyManager.updateUsersList(serverAnswer.data);
+            favoritesWidget.setMessage(true, 'Пользователь успешно удален из адресной книги.');
+        } else {
+            favoritesWidget.setMessage(false, 'Удалить не удалось:\n' + serverAnswer.error);
+        }
+    });
+}   //  favoritesWidget.removeUserCallback
