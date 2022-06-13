@@ -26,7 +26,6 @@ const getRates = function () {
     ApiConnector.getStocks((serverAnswer) => {
         // debugger;
         if (serverAnswer.success) {
-            // alert('Курсы получены успешно');
             ratesBoard.clearTable();
             ratesBoard.fillTable(serverAnswer.data);
         }
@@ -93,6 +92,7 @@ ApiConnector.getFavorites((serverAnswer) => {
     }
 });
 
+
 favoritesWidget.addUserCallback = function (data) {
     ApiConnector.addUserToFavorites(data, (serverAnswer) => {
         // debugger;
@@ -105,7 +105,7 @@ favoritesWidget.addUserCallback = function (data) {
             favoritesWidget.setMessage(false, 'Добавить в адресуню книгу не удалось:\n' + serverAnswer.error);
         }
     });
-}
+}   //  favoritesWidget.addUserCallback
 
 
 favoritesWidget.removeUserCallback = function (data) {
